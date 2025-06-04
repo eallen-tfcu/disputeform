@@ -1,178 +1,252 @@
-import React, { useState, useEffect } from 'react';
-
-const VisaFraudDisputeForm = () => {
-  const [memberInfo, setMemberInfo] = useState({
-    memberName: '',
-    lastFourCard: '',
-    date: '',
-    representativeName: ''
-  });
-
-  const [transactions, setTransactions] = useState(
-    Array(15).fill().map(() => ({ date: '', merchantName: '', amount: '' }))
-  );
-
-  const [totalAmount, setTotalAmount] = useState(0);
-
-  // Calculate total whenever transactions change
-  useEffect(() => {
-    const sum = transactions.reduce((total, transaction) => {
-      const amount = parseFloat(transaction.amount) || 0;
-      return total + amount;
-    }, 0);
-    setTotalAmount(sum);
-  }, [transactions]);
-
-  const handleMemberInfoChange = (field, value) => {
-    setMemberInfo(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleTransactionChange = (index, field, value) => {
-    setTransactions(prev => {
-      const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        [field]: value
-      };
-      return updated;
-    });
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">VISA Debit Card Fraud Dispute</h1>
-        <p className="text-red-600 font-medium">List all disputed transactions on this form.</p>
-      </div>
-
-      {/* Member Information Section */}
-      <div className="mb-8">
-        <table className="w-full border-collapse border border-gray-400">
-          <thead>
-            <tr className="bg-blue-50">
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700">Member Name</th>
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700">Last 4 of Card #</th>
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700">Date</th>
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700">Representative Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-gray-400 p-1">
-                <input
-                  type="text"
-                  value={memberInfo.memberName}
-                  onChange={(e) => handleMemberInfoChange('memberName', e.target.value)}
-                  className="w-full px-2 py-1 border-none outline-none bg-transparent"
-                  placeholder=""
-                />
-              </td>
-              <td className="border border-gray-400 p-1">
-                <input
-                  type="text"
-                  value={memberInfo.lastFourCard}
-                  onChange={(e) => handleMemberInfoChange('lastFourCard', e.target.value)}
-                  className="w-full px-2 py-1 border-none outline-none bg-transparent"
-                  placeholder=""
-                  maxLength="4"
-                />
-              </td>
-              <td className="border border-gray-400 p-1">
-                <input
-                  type="date"
-                  value={memberInfo.date}
-                  onChange={(e) => handleMemberInfoChange('date', e.target.value)}
-                  className="w-full px-2 py-1 border-none outline-none bg-transparent"
-                />
-              </td>
-              <td className="border border-gray-400 p-1">
-                <input
-                  type="text"
-                  value={memberInfo.representativeName}
-                  onChange={(e) => handleMemberInfoChange('representativeName', e.target.value)}
-                  className="w-full px-2 py-1 border-none outline-none bg-transparent"
-                  placeholder=""
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      {/* Transactions Section */}
-      <div className="mb-6">
-        <table className="w-full border-collapse border border-gray-400">
-          <thead>
-            <tr className="bg-blue-50">
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700 w-32">Date</th>
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700">Merchant Name</th>
-              <th className="border border-gray-400 px-3 py-2 text-sm font-medium text-gray-700 w-40">Transaction Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((transaction, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="border border-gray-400 p-1">
-                  <input
-                    type="date"
-                    value={transaction.date}
-                    onChange={(e) => handleTransactionChange(index, 'date', e.target.value)}
-                    className="w-full px-2 py-1 border-none outline-none bg-transparent text-sm"
-                  />
-                </td>
-                <td className="border border-gray-400 p-1">
-                  <input
-                    type="text"
-                    value={transaction.merchantName}
-                    onChange={(e) => handleTransactionChange(index, 'merchantName', e.target.value)}
-                    className="w-full px-2 py-1 border-none outline-none bg-transparent text-sm"
-                    placeholder=""
-                  />
-                </td>
-                <td className="border border-gray-400 p-1">
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={transaction.amount}
-                    onChange={(e) => handleTransactionChange(index, 'amount', e.target.value)}
-                    className="w-full px-2 py-1 border-none outline-none bg-transparent text-sm text-right"
-                    placeholder="0.00"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* AutoSum Total Box */}
-      <div className="flex justify-end">
-        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 shadow-md">
-          <div className="flex items-center space-x-4">
-            <span className="text-lg font-semibold text-gray-700">Total Disputed Amount:</span>
-            <div className="bg-white border border-gray-300 rounded px-4 py-2 min-w-32">
-              <span className="text-xl font-bold text-green-600">
-                ${totalAmount.toFixed(2)}
-              </span>
-            </div>
-          </div>
-          <div className="text-xs text-gray-600 mt-2">
-            ✓ Automatically calculated from transaction amounts above
-          </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISA Debit Card Fraud Dispute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #dc3545;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background-color: #e3f2fd;
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        td {
+            border: 1px solid #666;
+            padding: 0;
+            height: 35px;
+        }
+        
+        input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 5px 8px;
+            font-size: 13px;
+            background: transparent;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"] {
+            text-align: right;
+        }
+        
+        .member-table {
+            margin-bottom: 30px;
+        }
+        
+        .member-table th:nth-child(1) { width: 25%; }
+        .member-table th:nth-child(2) { width: 20%; }
+        .member-table th:nth-child(3) { width: 20%; }
+        .member-table th:nth-child(4) { width: 35%; }
+        
+        .transaction-table th:nth-child(1) { width: 20%; }
+        .transaction-table th:nth-child(2) { width: 50%; }
+        .transaction-table th:nth-child(3) { width: 30%; }
+        
+        .autosum-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .autosum-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .autosum-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .autosum-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .autosum-value {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            min-width: 120px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .autosum-note {
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .instructions p {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="header">
+            <h1>VISA Debit Card Fraud Dispute</h1>
+            <p>List all disputed transactions on this form.</p>
         </div>
-      </div>
 
-      {/* Instructions */}
-      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm text-gray-600">
-          <strong>Instructions:</strong> Fill out all member information at the top, then list each disputed transaction with the date, merchant name, and amount. The total will be automatically calculated as you enter amounts.
-        </p>
-      </div>
+        <!-- Member Information Table -->
+        <table class="member-table">
+            <thead>
+                <tr>
+                    <th>Member Name</th>
+                    <th>Last 4 of Card #</th>
+                    <th>Date</th>
+                    <th>Representative Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" id="memberName" placeholder=""></td>
+                    <td><input type="text" id="cardLast4" maxlength="4" placeholder=""></td>
+                    <td><input type="date" id="formDate"></td>
+                    <td><input type="text" id="repName" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Transaction Table -->
+        <table class="transaction-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Merchant Name</th>
+                    <th>Transaction Amount</th>
+                </tr>
+            </thead>
+            <tbody id="transactionTableBody">
+                <!-- Rows will be generated by JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- AutoSum Box -->
+        <div class="autosum-container">
+            <div class="autosum-box">
+                <div class="autosum-content">
+                    <span class="autosum-label">Total Disputed Amount:</span>
+                    <div class="autosum-value" id="totalAmount">$0.00</div>
+                </div>
+                <div class="autosum-note">✓ Automatically calculated from transaction amounts above</div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Fill out all member information at the top, then list each disputed transaction with the date, merchant name, and amount. The total will be automatically calculated as you enter amounts.</p>
+        </div>
     </div>
-  );
-};
 
-export default VisaFraudDisputeForm;
+    <script>
+        // Generate transaction table rows
+        function generateTransactionRows() {
+            const tbody = document.getElementById('transactionTableBody');
+            
+            for (let i = 0; i < 15; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="date" class="transaction-date"></td>
+                    <td><input type="text" class="merchant-name" placeholder=""></td>
+                    <td><input type="number" step="0.01" class="transaction-amount" placeholder="0.00" oninput="calculateTotal()"></td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Calculate total amount
+        function calculateTotal() {
+            const amountInputs = document.querySelectorAll('.transaction-amount');
+            let total = 0;
+
+            amountInputs.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+
+            document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+        }
+
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            generateTransactionRows();
+            calculateTotal(); // Initialize with $0.00
+        });
+
+        // Add event listeners for real-time calculation
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('transaction-amount')) {
+                calculateTotal();
+            }
+        });
+    </script>
+</body>
+</html>
